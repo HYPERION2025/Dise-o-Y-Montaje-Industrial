@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ARS Automobili — Arte en Movimiento</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0a0a0a;
+      --card:#111;
+      --muted:#bdbdbd;
+      --white:#fff;
+      --brand:#e0d5c2;
+      --accent:#e4b061;
+      --shadow:0 10px 25px rgba(0,0,0,.35);
+      --radius:20px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--white);
+      font-family:'Roboto',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      line-height:1.5;
+      overflow-y:auto;
+      scroll-behavior:smooth;
+    }
+    main{scroll-snap-type:y mandatory}
+    section.snap{
+      height:100svh;
+      position:relative;
+      scroll-snap-align:start;
+      display:grid;
+      place-items:center;
+      padding: clamp(16px, 4vw, 48px);
+      isolation:isolate;
+    }
+    .bg{position:absolute; inset:0; z-index:-2; background-size:cover; background-position:center; background-repeat:no-repeat; transform:scale(1.02); transition:transform .8s ease; will-change:transform;}
+    .veil{position:absolute; inset:0; z-index:-1; background:radial-gradient(120% 120% at 50% 80%, rgba(0,0,0,.05), rgba(0,0,0,.6) 60%, rgba(0,0,0,.85)); pointer-events:none;}
+    section.snap:is(:hover,:focus-within) .bg{ transform:scale(1.06)}
+    header{position:fixed; inset:0 0 auto 0; height:64px; z-index:50; display:flex; align-items:center; justify-content:space-between; padding:0 clamp(16px, 4vw, 48px); background:linear-gradient(to bottom, rgba(0,0,0,.55), transparent); backdrop-filter:saturate(160%) blur(6px);}
+    .brand{display:flex; gap:12px; align-items:center; letter-spacing:2px}
+    .brand__logo{ width:40px; height:40px; border-radius:50%; border:1px solid rgba(255,255,255,.25); display:grid; place-items:center; font-weight:700; font-family:"Playfair Display", serif; }
+    .brand__name{ font-family:"Playfair Display", serif; font-weight:700; font-size:1.1rem }
+    nav{display:flex; gap:20px; align-items:center}
+    nav a{color:var(--white); text-decoration:none; font-weight:500; font-size:.95rem; opacity:.85; position:relative; padding:.25rem 0}
+    nav a:hover, nav a.active{opacity:1}
+    nav a::after{content:""; position:absolute; left:0; bottom:-6px; height:2px; width:0; background:var(--accent); transition:width .3s ease}
+    nav a:hover::after, nav a.active::after{ width:100% }
+    .burger{display:none; width:44px; height:44px; border:1px solid rgba(255,255,255,.25); border-radius:999px; background:transparent; color:#fff}
+    .burger span{display:block; width:22px; height:2px; background:#fff; margin:0 auto; position:relative}
+    .burger span::before,.burger span::after{content:""; position:absolute; left:0; width:22px; height:2px; background:#fff}
+    .burger span::before{ top:-6px }
+    .burger span::after{ top:6px }
+    .drawer{ position:fixed; inset:64px 0 auto 0; background:rgba(0,0,0,.9); transform:translateY(-110%); transition:transform .35s ease; z-index:40; padding:16px 24px; border-bottom:1px solid rgba(255,255,255,.08) }
+    .drawer.open{ transform:translateY(0) }
+    .drawer a{ display:block; padding:14px 10px; color:#fff; text-decoration:none; border-radius:10px }
+    .drawer a:hover{ background:rgba(255,255,255,.06) }
+    .hero h1{font-family:"Playfair Display", serif; font-size: clamp(38px, 6vw, 84px); line-height:1.05; letter-spacing:.5px; margin:0 0 12px;}
+    .hero p{ max-width:800px; color:var(--muted); font-size: clamp(16px, 2.1vw, 20px) }
+    .cta{ display:flex; gap:12px; margin-top:28px; flex-wrap:wrap }
+    .btn{appearance:none; border:none; cursor:pointer; font-weight:600; letter-spacing:.4px; padding:12px 20px; border-radius:999px; box-shadow:var(--shadow);}
+    .btn--primary{ background:var(--accent); color:#1a1a1a }
+    .btn--ghost{ background:transparent; color:#fff; border:1px solid rgba(255,255,255,.3) }
+    .btn:active{ transform:translateY(1px) }
+    .section-title{ width:100%; max-width:1200px; margin-inline:auto; padding:0 8px 18px; font-family:"Playfair Display", serif; letter-spacing:.4px; font-size: clamp(24px, 3.2vw, 36px) }
+    .grid{ width:100%; max-width:1200px; margin-inline:auto; display:grid; gap:18px; grid-template-columns: repeat(12, 1fr);}
+    .card{ grid-column: span 12; background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); overflow:hidden; position:relative; isolation:isolate;}
+    @media(min-width:720px){ .card{ grid-column: span 6 } }
+    @media(min-width:1024px){ .card{ grid-column: span 4 } }
+    .card__media{ aspect-ratio:16/9; overflow:hidden; position:relative }
+    .card__media img{ width:100%; height:100%; object-fit:cover; transition:transform .45s ease }
+    .card:hover .card__media img{ transform:scale(1.08) }
+    .chip{ position:absolute; top:12px; left:12px; padding:6px 10px; border-radius:999px; background:rgba(0,0,0,.6); border:1px solid rgba(255,255,255,.2); font-size:.8rem }
+    .card__body{ padding:16px }
+    .card__title{ font-weight:700; font-size:1.05rem; margin:0 0 6px }
+    .card__meta{ color:var(--muted); font-size:.9rem; display:flex; gap:10px; flex-wrap:wrap }
+    .card__actions{ display:flex; gap:10px; margin-top:14px }
+    .mini{ padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,.14); background:transparent; color:#fff; cursor:pointer }
+    .mini.primary{ background:var(--accent); color:#121212; border:none }
+    .story{ text-align:center; max-width:950px; margin-inline:auto }
+    .story h2{ font-family:"Playfair Display", serif; font-size: clamp(28px, 3.8vw, 48px); margin:0 0 12px }
+    .story p{ color:var(--muted); font-size: clamp(16px, 2.1vw, 20px) }
+    dialog{ width:min(900px, 92vw); border:none; border-radius:18px; background:#0f0f0f; color:#fff; padding:0; box-shadow:var(--shadow); }
+    dialog::backdrop{ background:rgba(0,0,0,.6) }
+    .modal__media{ aspect-ratio:16/9; background:#000; overflow:hidden }
+    .modal__media img{ width:100%; height:100%; object-fit:cover }
+    .modal__body{ padding:18px 18px 22px }
+    .modal__head{ display:flex; align-items:center; justify-content:space-between; gap:16px }
+    .x{ background:transparent; border:1px solid rgba(255,255,255,.25); color:#fff; border-radius:10px; padding:8px 10px; cursor:pointer }
+    .specs{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:10px; margin:14px 0; color:var(--muted) }
+    .price{ font-size:1.25rem; font-weight:700; margin-top:10px }
+    .buyrow{ display:flex; gap:10px; flex-wrap:wrap; margin-top:16px }
+    .contact{ width:100%; max-width:1100px; margin-inline:auto; display:grid; gap:20px; grid-template-columns:1fr; align-items:center}
+    .contact__card{ background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); padding:20px }
+    .contact form{ display:grid; gap:12px }
+    input, textarea, select{ background:#0c0c0c; border:1px solid rgba(255,255,255,.16); color:#fff; padding:12px 14px; border-radius:12px; font:inherit}
+    textarea{ min-height:120px; resize:vertical }
+    @media(min-width:960px){ .contact{ grid-template-columns: .9fr 1.1fr } }
+    footer{ padding:28px; border-top:1px solid rgba(255,255,255,.08); color:var(--muted); text-align:center }
+    .tag{ color:#121212; background:var(--brand); display:inline-block; padding:6px 10px; border-radius:999px; font-weight:700; letter-spacing:.6px }
+    .fade-up{ opacity:0; transform:translateY(10px); transition:all .6s ease }
+    .fade-up.in{ opacity:1; transform:none }
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <header>
+    <div class="brand">
+      <div class="brand__logo">A</div>
+      <div class="brand__name">ARS Automobili</div>
+    </div>
+    <nav class="desktop-nav">
+      <a href="#inicio" class="active">Inicio</a>
+      <a href="#modelos">Modelos</a>
+      <a href="#experiencia">Experiencia</a>
+      <a href="#contacto">Contacto</a>
+      <a href="#comprar" class="tag" style="margin-left:6px">Comprar</a>
+    </nav>
+    <button class="burger" aria-label="Abrir menú"><span></span></button>
+  </header>
+  <div class="drawer" id="drawer">
+    <a href="#inicio">Inicio</a>
+    <a href="#modelos">Modelos</a>
+    <a href="#experiencia">Experiencia</a>
+    <a href="#contacto">Contacto</a>
+    <a href="#comprar">Comprar</a>
+  </div>
+
+  <main>
+    <!-- HERO / INICIO -->
+    <section id="inicio" class="snap hero">
+      <div class="bg" style="background-image:url('https://images.unsplash.com/photo-1553440569-bcc63803a83d?q=80&w=1920&auto=format&fit=crop');"></div>
+      <div class="veil"></div>
+      <div class="content">
+        <h1 class="fade-up">Arte en movimiento</h1>
+        <p class="fade-up" style="transition-delay:.08s">Diseñamos y seleccionamos automóviles de colección con la precisión de una obra de arte. Rendimiento, materiales nobles y exclusividad en cada detalle.</p>
+        <div class="cta fade-up" style="transition-delay:.12s">
+          <a class="btn btn--primary" href="#modelos">Explorar Modelos</a>
+          <a class="btn btn--ghost" href="#contacto">Solicitar Cita</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODELOS -->
+    <section id="modelos" class="snap">
+      <div class="bg" style="background-image:url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1920&auto=format&fit=crop'); filter:blur(2px) brightness(.55);"></div>
+      <div class="veil"></div>
+
+      <div style="width:100%">
+        <h2 class="section-title">Colección 2025</h2>
+        <div class="grid">
+          <!-- Card 1 -->
+          <article class="card fade-up" data-title="ARS Corsa" data-price="$420,000" data-specs='{"Motor":"V12 atmosférico","Potencia":"760 hp","0–100":"2.8 s","Peso":"1,250 kg"}' data-img="https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?q=80&w=1600&auto=format&fit=crop">
+            <div class="card__media">
+              <img src="https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?q=80&w=1600&auto=format&fit=crop" alt="ARS Corsa"/>
+              <span class="chip">Nuevo</span>
+            </div>
+            <div class="card__body">
+              <h3 class="card__title">ARS Corsa</h3>
+              <div class="card__meta"><span>V12</span><span>760 hp</span><span>RWD</span></div>
+              <div class="card__actions">
+                <button class="mini primary" data-open>Detalles</button>
+                <button class="mini">Configurar</button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card 2 -->
+          <article class="card fade-up" data-title="ARS Strada" data-price="$320,000" data-specs='{"Motor":"V8 Biturbo","Potencia":"680 hp","0–100":"3.1 s","Peso":"1,380 kg"}' data-img="https://images.unsplash.com/photo-1600377559376-16c0cf4cd1b7?q=80&w=1600&auto=format&fit=crop">
+            <div class="card__media">
+              <img src="https://images.unsplash.com/photo-1600377559376-16c0cf4cd1b7?q=80&w=1600&auto=format&fit=crop" alt="ARS Strada"/>
+            </div>
+            <div class="card__body">
+              <h3 class="card__title">ARS Strada</h3>
+              <div class="card__meta"><span>V8</span><span>680 hp</span><span>AWD</span></div>
+              <div class="card__actions">
+                <button class="mini primary" data-open>Detalles</button>
+                <button class="mini">Configurar</button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+	
+	
+
+
+    <!-- EXPERIENCIA / Historia -->
+    <section id="experiencia" class="snap">
+      <div class="bg" style="background-image:url('https://images.unsplash.com/photo-1520962911143-0b1d3a0d44c0?q=80&w=1920&auto=format&fit=crop');"></div>
+      <div class="veil"></div>
+      <div class="story fade-up">
+        <h2>Nuestra Historia</h2>
+        <p>ARS Automobili nació de la pasión por los autos exóticos y de colección. Cada vehículo que ofrecemos es seleccionado por su rendimiento, exclusividad y diseño, garantizando experiencias únicas para nuestros clientes.</p>
+      </div>
+    </section>
+
+    <!-- CONTACTO -->
+    <section id="contacto" class="snap">
+      <div class="bg" style="background-image:url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1920&auto=format&fit=crop'); filter:brightness(.3)"></div>
+      <div class="veil"></div>
+      <div class="contact fade-up">
+        <div class="contact__card">
+          <h2>Solicita tu Cita</h2>
+          <form id="form_contacto" method="POST" action="https://formspree.io/f/mwpnppld">
+            <input type="text" name="nombre" placeholder="Nombre" required />
+            <input type="email" name="email" placeholder="Correo" required />
+            <select name="modelo" required>
+              <option value="">Seleccion</option>
+              <option value="ARS Corsa">Trabajo</option>
+              <option value="ARS Strada">Soldadura</option>
+            </select>
+            <textarea name="mensaje" placeholder="Mensaje" required></textarea>
+            <button type="submit" class="btn btn--primary">Enviar</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      &copy; 2025 Diseño Y Montaje Industrial. Todos los derechos reservados.
+    </footer>
+  </main>
+
+  <!-- MODAL DETALLES -->
+  <dialog id="modal">
+    <div class="modal__media"><img src="" alt="Detalle"/></div>
+    <div class="modal__body">
+      <div class="modal__head">
+        <h3></h3>
+        <button class="x" data-close>X</button>
+      </div>
+      <div class="specs"></div>
+      <div class="price"></div>
+      <div class="buyrow">
+        <button class="btn btn--primary">Comprar</button>
+        <button class="btn btn--ghost" data-close>Cerrar</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+    // BURGER
+    const burger = document.querySelector('.burger');
+    const drawer = document.getElementById('drawer');
+    burger.addEventListener('click',()=> drawer.classList.toggle('open'))
+
+    // MODAL
+    const modal = document.getElementById('modal');
+    document.querySelectorAll('[data-open]').forEach(btn=>{
+      btn.addEventListener('click', e=>{
+        const card = e.target.closest('.card');
+        modal.querySelector('h3').textContent = card.dataset.title;
+        modal.querySelector('.modal__media img').src = card.dataset.img;
+        const specs = JSON.parse(card.dataset.specs);
+        modal.querySelector('.specs').innerHTML = Object.entries(specs).map(([k,v])=>`<div><strong>${k}:</strong> ${v}</div>`).join('');
+        modal.querySelector('.price').textContent = card.dataset.price;
+        modal.showModal();
+      })
+    })
+    modal.querySelectorAll('[data-close]').forEach(btn=>{
+      btn.addEventListener('click', ()=> modal.close())
+    })
+
+    // FORMULARIO
+    const form = document.getElementById('form_contacto');
+    form.addEventListener('submit', async e=>{
+      e.preventDefault();
+      const data = new FormData(form);
+      try{
+        const res = await fetch(form.action, {
+          method:'POST',
+          body:data,
+          headers:{'Accept':'application/json'}
+        });
+        if(res.ok){
+          alert(`Gracias, ${data.get('nombre')}. Te contactaremos a ${data.get('email')} por el modelo ${data.get('modelo')}.`);
+          form.reset();
+        } else alert('Ups, hubo un error. Intenta nuevamente.');
+      } catch(err){
+        alert('Error al enviar el formulario.');
+        console.error(err);
+      }
+    });
+
+    // ANIMACIONES FADE UP
+    const faders = document.querySelectorAll('.fade-up');
+    const appearOptions = { threshold: 0.2, rootMargin:"0px 0px -50px 0px" };
+    const appearOnScroll = new IntersectionObserver((entries, observer)=>{
+      entries.forEach(entry=>{
+        if(!entry.isIntersecting) return;
+        entry.target.classList.add('in');
+        observer.unobserve(entry.target);
+      })
+    }, appearOptions);
+    faders.forEach(fader=>appearOnScroll.observe(fader));
+  </script>
+</body>
+</html>
